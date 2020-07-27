@@ -8,6 +8,7 @@ import android.os.StrictMode;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -53,6 +55,8 @@ import ru.evotor.framework.receipt.Position;
 import ru.evotor.framework.receipt.PrintGroup;
 import ru.evotor.framework.receipt.Receipt;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE_FOR_NEW_PRODUCT = 10;
@@ -60,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     OkHttpClient client = new OkHttpClient();
 
-    public String baseUrl= "http://192.168.1.105/";
+    public String baseUrl= "http://192.168.0.10/";
     public String url = baseUrl + "api/evotor/longPulling";
 
     private static WarrantArrayAdapter warrantArrayAdapter;
@@ -72,7 +76,8 @@ public class MainActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         setContentView(R.layout.activity_main);
-
+        Objects.requireNonNull(getSupportActionBar()).setTitle("Платёжная интеграция BBCRM");
+        getSupportActionBar().setSubtitle("главная страница");
         final Button button = findViewById(R.id.btnOpenReceipt);
 
         button.setOnClickListener(new View.OnClickListener() {
@@ -113,8 +118,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void alert(){
-        Toast.makeText(MainActivity.this, "ok", Toast.LENGTH_LONG).show();
+    public void alert(Warrant warrant){
+        //Toast.makeText(MainActivity.this, "ok", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(this, WarrantActivity.class);
+        intent.putExtra("Warrant", warrant);
+        startActivity(intent);
     }
 
     public static void catchResponse(String response, final MainActivity activity) throws JSONException {
@@ -122,10 +130,22 @@ public class MainActivity extends AppCompatActivity {
         JSONArray warrants = obj.getJSONArray("warrants");
         List<String[]> warrantItems = new ArrayList<String[]>();
         for (int i=0; i < warrants.length(); i++) {
-            String[] warrant = new String[3];
-            warrant[0] = "warrant";
-            warrant[1] = "Кассовый ордер №" + warrants.getJSONObject(i).getString("id");
+            String[] warrant = new String[15];
+            warrant[0] = "ic_up";
+            warrant[1] = warrants.getJSONObject(i).getString("name");
             warrant[2] = warrants.getJSONObject(i).getString("summ");
+            warrant[3] = warrants.getJSONObject(i).getString("isIncoming");
+            warrant[4] = warrants.getJSONObject(i).getString("date");
+            warrant[5] = warrants.getJSONObject(i).getString("id");
+            warrant[6] = warrants.getJSONObject(i).getString("created_at");
+            warrant[7] = warrants.getJSONObject(i).getString("partner");
+            warrant[8] = warrants.getJSONObject(i).getString("partner_id");
+            warrant[9] = warrants.getJSONObject(i).getString("cashbox");
+            warrant[10] = warrants.getJSONObject(i).getString("cashbox_id");
+            warrant[11] = warrants.getJSONObject(i).getString("dds");
+            warrant[12] = warrants.getJSONObject(i).getString("dds_id");
+            warrant[13] = warrants.getJSONObject(i).getString("comment");
+            warrant[14] = warrants.getJSONObject(i).getString("reason");
             warrantItems.add(warrant);
         }
         ListView warrantList = activity.findViewById(R.id.warrants);
@@ -136,28 +156,31 @@ public class MainActivity extends AppCompatActivity {
         warrantList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Get the selected item text from ListView
-                //String selectedItem = (String) parent.getItemAtPosition(position);
-                //Toast.makeText(activity, position, Toast.LENGTH_LONG).show();
-                // Display the selected item text on TextView
-                activity.alert();
-                //tv.setText("Your favorite : " + selectedItem);
+                Warrant warrant = (Warrant) parent.getItemAtPosition(position);
+                activity.alert(warrant);
             }
         });
-//
-
 
         warrantArrayAdapter = new WarrantArrayAdapter(activity, R.layout.warrant_list_item);
         warrantList.setAdapter(warrantArrayAdapter);
-
-
 
         for(String[] warrantData:warrantItems ) {
             String warrantImg = warrantData[0];
             String warrantName = warrantData[1];
             String warrant_sum = warrantData[2];
-            int warrantImgResId = activity.getResources().getIdentifier(warrantImg, "drawable", "com.javapapers.android.listviewcustomlayout.app");
-            Warrant warrant = new Warrant(warrantImgResId,warrantName,warrant_sum);
+            String isIncoming = warrantData[3];
+            String date = warrantData[4];
+            Integer id = Integer.parseInt(warrantData[5]);
+            String created_at = warrantData[6];
+            String partner = warrantData[7];
+            Integer partner_id = Integer.parseInt(warrantData[8]);
+            String cashbox = warrantData[9];
+            Integer cashbox_id = Integer.parseInt(warrantData[10]);
+            String dds = warrantData[11];
+            Integer dds_id = Integer.parseInt(warrantData[12]);
+            String comment = warrantData[13];
+            String reason = warrantData[14];
+            Warrant warrant = new Warrant(warrantImg,warrantName,warrant_sum,isIncoming, date, id, created_at, partner, partner_id, cashbox, cashbox_id, dds, dds_id, comment, reason);
             warrantArrayAdapter.add(warrant);
         }
     }
@@ -217,93 +240,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void call() {
-//        Toast.makeText(this, "вызываем продажу", Toast.LENGTH_LONG).show();
-//        startActivityForResult(NavigationApi.createIntentForNewProduct(
-//                new NavigationApi.NewProductIntentBuilder().setBarcode("111")
-//        ), 10);
-        List<Position> list = new ArrayList<>();
-        list.add(
-                Position.Builder.newInstance(
-                        //UUID позиции
-                        UUID.randomUUID().toString(),
-                        //UUID товара
-                        null,
-                        //Наименование
-                        "12234",
-                        //Наименование единицы измерения
-                        "12",
-                        //Точность единицы измерения
-                        0,
-                        //Цена без скидок
-                        new BigDecimal(1000),
-                        //Количество
-                        new BigDecimal(2)
-                ).build()
-        );
-        list.add(
-                Position.Builder.newInstance(
-                        UUID.randomUUID().toString(),
-                        null,
-                        "1234",
-                        "12",
-                        0,
-                        new BigDecimal(500),
-                        new BigDecimal(1))
-                        //Добавление цены с учетом скидки на позицию. Итог = price - priceWithDiscountPosition
-                        .setPriceWithDiscountPosition(new BigDecimal(300)).build()
-        );
 
-        String randomUUID = UUID.randomUUID().toString();
-        //List<HashMap> payments = new ArrayList<>();
-        HashMap payments = new HashMap<Payment, BigDecimal>();
-        payments.put(new Payment(
-                randomUUID,
-                new BigDecimal(9300 ),
-                null,
-                new PaymentPerformer(
-                        new PaymentSystem(PaymentType.ELECTRON, "Internet", "124224"),
-                        "имя пакета",
-                        "название компонента",
-                        "app_uuid",
-                        "appName"
-                ),
-                null,
-                null,
-                null
-        ), new BigDecimal(9300 ));
-
-        PrintGroup printGroup = new PrintGroup(UUID.randomUUID().toString(), PrintGroup.Type.CASH_RECEIPT, null, null, null, null, true);
-
-        Receipt.PrintReceipt printReceipt = new Receipt.PrintReceipt(printGroup, list, payments,
-                new HashMap<Payment, BigDecimal>(), new HashMap<String, BigDecimal>()
-        );
-
-        ArrayList<Receipt.PrintReceipt> listDocs = new ArrayList<>();
-        listDocs.add(printReceipt);
-        //Добавление скидки на чек
-        BigDecimal receiptDiscount = new BigDecimal(1000);
-        new PrintSellReceiptCommand(listDocs, null, "79524365062", "exam2ple@example.com", receiptDiscount, "ad", "awd").process(MainActivity.this, new IntegrationManagerCallback() {
-            @Override
-            public void run(IntegrationManagerFuture integrationManagerFuture) {
-                try {
-                    IntegrationManagerFuture.Result result = integrationManagerFuture.getResult();
-                    switch (result.getType()) {
-                        case OK:
-                            PrintReceiptCommandResult printSellReceiptResult = PrintReceiptCommandResult.create(result.getData());
-                            Toast.makeText(MainActivity.this, "OK", Toast.LENGTH_LONG).show();
-                            break;
-                        case ERROR:
-                            Toast.makeText(MainActivity.this, result.getError().getMessage(), Toast.LENGTH_LONG).show();
-                            break;
-                    }
-                } catch (IntegrationException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-
-    }
 }
 

@@ -1,43 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_marginBottom="0dp"
-    android:layout_marginTop="0dp">
+    android:layout_marginTop="0dp"
+    tools:ignore="ExtraText">
 
     <ImageView
         android:id="@+id/warrantImg"
-        android:layout_width="0dp"
-        android:layout_height="17dp"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
         android:layout_centerVertical="true"
         android:paddingLeft="10dp"
         android:paddingTop="10dp"
         android:paddingRight="10dp"
-        android:scaleType="centerCrop"
-        app:srcCompat="@android:drawable/ic_dialog_dialer" />
-
-    <TextView
-        android:id="@+id/warrantName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_toRightOf="@+id/warrantImg"
-        android:gravity="center"
-        android:paddingTop="10dp"
-        android:text="Cherry" />
+        android:scaleType="fitStart"
+        app:srcCompat="@drawable/ic_up" />
 
     <TextView
         android:id="@+id/warrant_sum"
         android:gravity="center"
+        android:layout_height="54dp"
         android:layout_centerInParent="true"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:paddingTop="10dp"
         android:paddingRight="10dp"
         android:text="2333"
         android:textSize="18sp"
         android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="32dp"
+        android:layout_height="54dp"
+        android:layout_alignParentRight="false"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="12dp"
+        android:layout_toLeftOf="@+id/warrant_sum"
+        android:layout_toRightOf="@+id/warrantImg"
+        android:gravity="bottom|top|left"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/warrantName"
+            android:layout_width="match_parent"
+            android:layout_height="27dp"
+            android:gravity="left"
+            android:paddingTop="0dp"
+            android:text="Кассовый ордер"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/warrantDate"
+            android:layout_width="match_parent"
+            android:layout_height="27dp"
+            android:gravity="left"
+            android:text="34 2434 234"
+            android:textSize="18sp" />
+
+    </LinearLayout>
 </RelativeLayout>
