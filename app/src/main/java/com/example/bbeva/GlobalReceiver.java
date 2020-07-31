@@ -17,6 +17,8 @@ import ru.evotor.framework.core.action.event.receipt.position_edited.PositionRem
 import ru.evotor.framework.core.action.event.receipt.receipt_edited.ReceiptClearedEvent;
 import ru.evotor.framework.core.action.event.receipt.receipt_edited.ReceiptClosedEvent;
 import ru.evotor.framework.core.action.event.receipt.receipt_edited.ReceiptOpenedEvent;
+import ru.evotor.framework.receipt.Receipt;
+import ru.evotor.framework.receipt.ReceiptApi;
 
 /**
  * Получение событий об открытии чека, обновлении базы продуктов или результате изменения чека
@@ -32,10 +34,11 @@ public class GlobalReceiver extends BroadcastReceiver {
 
         if (action != null) {
             switch (action) {
-                //Чек продажи был успешно открыт
-                case "evotor.intent.action.receipt.sell.OPENED":
-                    Log.e(getClass().getSimpleName(), "Data:" + ReceiptOpenedEvent.create(bundle).getReceiptUuid());
-                    Toast.makeText(context, action + "\nData:" + ReceiptOpenedEvent.create(bundle).getReceiptUuid(), Toast.LENGTH_SHORT).show();
+                case "evotor.intent.action.receipt.sell.RECEIPT_CLOSED":
+
+                    Toast.makeText(context, "HEHE", Toast.LENGTH_SHORT).show();
+                    Receipt receipt = ReceiptApi.getReceipt(context, ReceiptOpenedEvent.create(bundle).getReceiptUuid());
+                    Toast.makeText(context, receipt.toString(), Toast.LENGTH_SHORT).show();
                     break;
             }
         }

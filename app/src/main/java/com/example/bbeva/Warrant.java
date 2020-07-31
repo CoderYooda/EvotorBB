@@ -3,6 +3,12 @@ package com.example.bbeva;
 import android.content.Intent;
 import android.util.SparseIntArray;
 
+import com.google.gson.JsonArray;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -14,6 +20,8 @@ public class Warrant implements Serializable {
     private static final String TAG = "Warrant";
 
     private String warrantImg;
+    private Integer payment;
+    private Double discount;
     private Boolean isIncoming;
     private String warrantName;
     private String warrant_sum;
@@ -28,25 +36,29 @@ public class Warrant implements Serializable {
     private Integer dds_id;
     private String comment;
     private String reason;
+    private JSONArray warrant_items;
 
 
-    public Warrant(String warrantImg, String warrantName,String warrant_sum, String isIncoming, String date, Integer id, String created_at, String partner, Integer partner_id, String cashbox, Integer cashbox_id, String dds, Integer dds_id, String comment, String reason) {
+    public Warrant(JSONObject warrant) throws JSONException {
         super();
-        this.setWarrantImg(warrantImg);
-        this.setWarrantIncoming(Boolean.parseBoolean(isIncoming));
-        this.setWarrantName(warrantName);
-        this.setWarrantSum(warrant_sum);
-        this.setWarrantDate(date);
-        this.setWarrantId(id);
-        this.setWarrantCreatedAt(created_at);
-        this.setWarrantPartner(partner);
-        this.setWarrantPartnerId(partner_id);
-        this.setWarrantCashbox(cashbox);
-        this.setWarrantCashboxId(cashbox_id);
-        this.setWarrantDds(dds);
-        this.settWarrantDdsId(dds_id);
-        this.setWarrantComment(comment);
-        this.setWarrantReason(reason);
+        this.setWarrantImg("ic_up");
+        this.setWarrantDiscount(Double.parseDouble(warrant.getString("disc")));
+        this.setWarrantPayment(Integer.parseInt(warrant.getString("payment")));
+        this.setWarrantIncoming(Boolean.parseBoolean(warrant.getString("isIncoming")));
+        this.setWarrantName(warrant.getString("name"));
+        this.setWarrantSum(warrant.getString("summ"));
+        this.setWarrantDate(warrant.getString("date"));
+        this.setWarrantId(Integer.parseInt(warrant.getString("id")));
+        this.setWarrantCreatedAt(warrant.getString("created_at"));
+        this.setWarrantPartner(warrant.getString("name"));
+        this.setWarrantPartnerId(Integer.parseInt(warrant.getString("partner_id")));
+        this.setWarrantCashbox(warrant.getString("cashbox"));
+        this.setWarrantCashboxId(Integer.parseInt(warrant.getString("cashbox_id")));
+        this.setWarrantDds(warrant.getString("name"));
+        this.settWarrantDdsId(Integer.parseInt(warrant.getString("dds_id")));
+        this.setWarrantComment(warrant.getString("comment"));
+        this.setWarrantReason(warrant.getString("reason"));
+        this.setWarrantItems(warrant.getJSONArray("items"));
     }
 
     public String getWarrantName() {
@@ -63,6 +75,8 @@ public class Warrant implements Serializable {
     public void setWarrantDate(String date) { this.date = date; }
 
     public void setWarrantId(Integer id) { this.id = id; }
+    public void setWarrantDiscount(Double discount) { this.discount = discount; }
+    public void setWarrantPayment(Integer payment) { this.payment = payment; }
     public void setWarrantCreatedAt(String created_at) { this.created_at = created_at; }
     public void setWarrantPartner(String partner) { this.partner = partner; }
     public void setWarrantPartnerId(Integer partner_id) { this.partner_id = partner_id; }
@@ -72,6 +86,9 @@ public class Warrant implements Serializable {
     public void settWarrantDdsId(Integer dds_id) { this.dds_id = dds_id; }
     public void setWarrantComment(String comment) { this.comment = comment; }
     public void setWarrantReason(String reason) { this.reason = reason; }
+    public void setWarrantItems(JSONArray warrant_items) {
+        this.warrant_items = warrant_items;
+    }
 
 
     public String getWarrantSum() {
@@ -83,6 +100,8 @@ public class Warrant implements Serializable {
         return s + " ₽";
     }
     public String getWarrantImg()           { return warrantImg; }
+    public Integer getWarrantPayment()      { return payment; }
+    public Double getWarrantDiscount()      { return discount; }
     public String getWarrantDate()          { return date; }
     public Integer getWarrantId()           { return id; }
     public String getWarrantCreatedAt()     { return created_at; }
@@ -94,4 +113,5 @@ public class Warrant implements Serializable {
     public Integer getWarrantDdsId()        { return dds_id; }
     public String getWarrantComment()       { return comment; }
     public String getWarrantReason()        { return reason; }
+    public JSONArray getWarrantItems()      { return warrant_items; }
 }
